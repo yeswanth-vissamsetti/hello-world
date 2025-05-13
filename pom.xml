@@ -40,6 +40,17 @@
       </plugin>
 
       <plugin>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>9.4.44.v20210927</version>
+        <configuration>
+          <httpConnector>
+            <port>9090</port>
+          </httpConnector>
+        </configuration>
+      </plugin>
+
+      <plugin>
 	<groupId>org.apache.maven.plugins</groupId>
 	<artifactId>maven-war-plugin</artifactId>
 	<version>3.3.2</version> <!-- Use 3.3.2 or latest -->
