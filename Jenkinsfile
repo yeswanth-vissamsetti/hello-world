@@ -3,10 +3,10 @@ pipeline {
 
     stages {
         stage('Checkout') {
-            steps {
-                git 'https://github.com/your-user/your-repo.git'
-            }
-        }
+          steps {
+                git credentialsId: 'github-creds', url: 'https://github.com/yeswanth-vissamsetti/hello-world.git'
+                }
+               }
 
         stage('Build') {
             steps {
