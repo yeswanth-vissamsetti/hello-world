@@ -24,7 +24,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'sudo docker build -t $IMAGE_NAME .'
+                sh 'docker build -t $IMAGE_NAME .'
             }
         }
 
@@ -32,12 +32,12 @@ pipeline {
             steps {
                 script {
                     sh """
-                        if [ \$(sudo docker ps -q -f name=$CONTAINER_NAME) ]; then
-                            sudo docker stop $CONTAINER_NAME
+                        if [ \$(docker ps -q -f name=$CONTAINER_NAME) ]; then
+                            docker stop $CONTAINER_NAME
                         fi
 
-                        if [ \$(sudo docker ps -aq -f name=$CONTAINER_NAME) ]; then
-                            sudo docker rm $CONTAINER_NAME
+                        if [ \$(docker ps -aq -f name=$CONTAINER_NAME) ]; then
+                            docker rm $CONTAINER_NAME
                         fi
                     """
                 }
@@ -46,7 +46,7 @@ pipeline {
 
         stage('Run Docker Container') {
             steps {
-                sh 'sudo docker run -d -p $PORT:8080 --name $CONTAINER_NAME $IMAGE_NAME'
+                sh 'docker run -d -p $PORT:8080 --name $CONTAINER_NAME $IMAGE_NAME'
             }
         }
     }
