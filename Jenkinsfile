@@ -2,44 +2,52 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'regapp'
-        CONTAINER_NAME = 'regapp-container'
-        HOST_PORT = '9090'
-        CONTAINER_PORT = '8080' // Tomcat default inside
+        IMAGE_NAME = 'webapp-image'
+        CONTAINER_NAME = 'webapp-container'
+        PORT = '9090'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git credentialsId: 'github-creds', url: 'https://github.com/yeswanth-vissamsetti/hello-world.git'
+                git credentialsId: 'your-git-credentials-id', url: 'https://github.com/yeswanth-vissamsetti/hello-world'
             }
         }
 
-        stage('Build WAR with Maven') {
+        stage('Build WAR') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                dir('webapp') {
+                    sh 'mvn clean package -DskipTests'
+                }
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${IMAGE_NAME} ."
+                sh 'sudo docker build -t $IMAGE_NAME .'
+            }
+        }
+
+        stage('Stop & Remove Old Container') {
+            steps {
+                script {
+                    sh """
+                        if [ \$(sudo docker ps -q -f name=$CONTAINER_NAME) ]; then
+                            sudo docker stop $CONTAINER_NAME
+                        fi
+
+                        if [ \$(sudo docker ps -aq -f name=$CONTAINER_NAME) ]; then
+                            sudo docker rm $CONTAINER_NAME
+                        fi
+                    """
+                }
             }
         }
 
         stage('Run Docker Container') {
             steps {
-                sh """
-                docker rm -f ${CONTAINER_NAME} || true
-                docker run -d -p ${HOST_PORT}:${CONTAINER_PORT} --name ${CONTAINER_NAME} ${IMAGE_NAME}
-                """
+                sh 'sudo docker run -d -p $PORT:8080 --name $CONTAINER_NAME $IMAGE_NAME'
             }
-        }
-    }
-
-    post {
-        success {
-            echo "App is available at: http://<your-server-ip>:${HOST_PORT}"
         }
     }
 }
